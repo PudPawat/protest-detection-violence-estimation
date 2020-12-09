@@ -27,8 +27,10 @@ class ProtestDataset(Dataset):
         self.label_frame = pd.read_csv(txt_file, delimiter="\t").replace('-', 0)
         self.img_dir = img_dir
         self.transform = transform
+
     def __len__(self):
         return len(self.label_frame)
+
     def __getitem__(self, idx):
         imgpath = os.path.join(self.img_dir,
                                 self.label_frame.iloc[idx, 0])
@@ -64,6 +66,7 @@ class ProtestDatasetEval(Dataset):
         self.img_list = sorted(os.listdir(img_dir))
     def __len__(self):
         return len(self.img_list)
+
     def __getitem__(self, idx):
         imgpath = os.path.join(self.img_dir,
                                 self.img_list[idx])

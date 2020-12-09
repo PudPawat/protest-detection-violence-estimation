@@ -2,7 +2,7 @@
 created by: Donghyeon Won
 Modified codes from
     http://pytorch.org/tutorials/beginner/data_loading_tutorial.html
-    https://github.com/pytorch/examples/tree/master/imagenet
+    https://github.com/pytorch/Fexamples/tree/master/imagenet
 """
 
 from __future__ import print_function
@@ -12,7 +12,8 @@ import numpy as np
 import pandas as pd
 import time
 import shutil
-from itertools import ifilter
+# from itertools import ifilter
+# from future_builtins import map, filter
 from PIL import Image
 from sklearn.metrics import accuracy_score, mean_squared_error
 
@@ -111,6 +112,8 @@ def train(train_loader, model, criterions, optimizer, epoch):
     for i, sample in enumerate(train_loader):
         # measure data loading batch_time
         input, target = sample['image'], sample['label']
+        # print(input.size())
+        # print(target)
         data_time.update(time.time() - end)
 
         if args.cuda:
@@ -118,6 +121,7 @@ def train(train_loader, model, criterions, optimizer, epoch):
             for k, v in target.items():
                 target[k] = v.cuda()
         target_var = {}
+
         for k,v in target.items():
             target_var[k] = Variable(v)
 
@@ -133,14 +137,27 @@ def train(train_loader, model, criterions, optimizer, epoch):
         # back prop
         loss.backward()
         optimizer.step()
+        # print("here",loss,losses)
 
         if N_protest:
-            loss_protest.update(losses[0].data[0], input.size(0))
-            loss_v.update(loss.data[0] - losses[0].data[0], N_protest)
+            # loss_protest.update(losses[0].data[0], input.size(0))
+            # print("1",losses[0].item())
+            loss_protest.update(losses[0].item(), input.size(0))
+
+            # loss_v.update(loss.data[0] - losses[0].data[0], N_protest)
+            loss_v.update(loss.item() - losses[0].item(), N_protest)
         else:
             # when there is no protest image in the batch
-            loss_protest.update(losses[0].data[0], input.size(0))
-        loss_history.append(loss.data[0])
+            # print(losses)
+            # print(losses[0])
+            # loss_protest.update(losses[0].data[0].item(), input.size(0))
+
+            loss_protest.update(losses[0].item(), input.size(0))
+
+        # print("2",loss)
+
+        # loss_history.append(loss.data[0])
+        loss_history.append(loss.item())
         protest_acc.update(scores['protest_acc'], input.size(0))
         violence_mse.update(scores['violence_mse'], N_protest)
         visattr_acc.update(scores['visattr_acc'], N_protest)
@@ -274,7 +291,7 @@ def main():
         model = model.cuda()
         criterions = [criterion.cuda() for criterion in criterions]
     # we are not training the frozen layers
-    parameters = ifilter(lambda p: p.requires_grad, model.parameters())
+    parameters = filter(lambda p: p.requires_grad, model.parameters())
 
     optimizer = torch.optim.SGD(
                         parameters, args.lr,
@@ -384,12 +401,12 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--workers",
                         type = int,
-                        default = 4,
+                        default = 1,
                         help = "number of workers",
                         )
     parser.add_argument("--batch_size",
                         type = int,
-                        default = 8,
+                        default = 32,
                         help = "batch size",
                         )
     parser.add_argument("--epochs",
