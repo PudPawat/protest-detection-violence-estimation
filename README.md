@@ -84,3 +84,8 @@ We fine-tuned ImageNet pretrained [ResNet50](https://arxiv.org/abs/1512.03385) t
 [night-roc]: https://github.com/wondonghyeon/protest-detection-violence-estimation/blob/master/files/night.png
 [shouting-roc]: https://github.com/wondonghyeon/protest-detection-violence-estimation/blob/master/files/shouting.png
 [violence-scatter]: https://github.com/wondonghyeon/protest-detection-violence-estimation/blob/master/files/violence.png
+
+
+#### PudPawat Version
+Using Other model eg.VGG Inception
+https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
