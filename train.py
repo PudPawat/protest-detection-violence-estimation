@@ -218,12 +218,15 @@ def validate(val_loader, model, criterions, epoch):
             loss += l
 
         if N_protest:
-            loss_protest.update(losses[0].data[0], input.size(0))
-            loss_v.update(loss.data[0] - losses[0].data[0], N_protest)
+            # loss_protest.update(losses[0].data[0], input.size(0))
+            # loss_v.update(loss.data[0] - losses[0].data[0], N_protest)
+            loss_protest.update(losses[0].data, input.size(0))
+            loss_v.update(loss.data - losses[0].data, N_protest)
         else:
             # when no protest images
-            loss_protest.update(losses[0].data[0], input.size(0))
-        loss_history.append(loss.data[0])
+            # loss_protest.update(losses[0].data[0], input.size(0))
+            loss_protest.update(losses[0].data, input.size(0))
+        loss_history.append(loss.data)
         protest_acc.update(scores['protest_acc'], input.size(0))
         violence_mse.update(scores['violence_mse'], N_protest)
         visattr_acc.update(scores['visattr_acc'], N_protest)
@@ -411,7 +414,7 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--epochs",
                         type = int,
-                        default = 100,
+                        default = 1,
                         help = "number of epochs",
                         )
     parser.add_argument("--weight_decay",
