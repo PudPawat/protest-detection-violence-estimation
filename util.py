@@ -36,9 +36,9 @@ class ProtestDataset(Dataset):
                                 self.label_frame.iloc[idx, 0])
         image = pil_loader(imgpath)
 
-        protest = self.label_frame.iloc[idx, 1:2].as_matrix().astype('float')
-        violence = self.label_frame.iloc[idx, 2:3].as_matrix().astype('float')
-        visattr = self.label_frame.iloc[idx, 3:].as_matrix().astype('float')
+        protest = self.label_frame.iloc[idx, 1:2].to_numpy().astype('float')
+        violence = self.label_frame.iloc[idx, 2:3].to_numpy().astype('float')
+        visattr = self.label_frame.iloc[idx, 3:].to_numpy().astype('float')
         label = {'protest':protest, 'violence':violence, 'visattr':visattr}
 
         sample = {"image":image, "label":label}

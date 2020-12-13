@@ -63,10 +63,12 @@ def calculate_loss(output, target, criterions, weights = [1, 10, 5]):
     outputs[0] = output.index_select(1, protest_idx)
     # violence output
     outputs[1] = output.index_select(1, violence_idx)
-    outputs[1].masked_fill_(not_protest_mask, 0)
+    # outputs[1].masked_fill_(not_protest_mask, 0)
+    outputs[1].bool().masked_fill_(not_protest_mask, 0)
     # visual attribute output
     outputs[2] = output.index_select(1, visattr_idx)
-    outputs[2].masked_fill_(not_protest_mask.repeat(1, 10),0)
+    # outputs[2].masked_fill_(not_protest_mask.repeat(1, 10),0)
+    outputs[2].bool().masked_fill_(not_protest_mask.repeat(1, 10),0)
 
 
     targets = [None] * 4
@@ -77,12 +79,12 @@ def calculate_loss(output, target, criterions, weights = [1, 10, 5]):
 
     scores = {}
     # protest accuracy for this batch
-    scores['protest_acc'] = accuracy_score(outputs[0].data.round(), targets[0].data)
+    scores['protest_acc'] = accuracy_score(outputs[0].cpu().data.round(), targets[0].cpu().data)
     # violence MSE for this batch
-    scores['violence_mse'] = ((outputs[1].data - targets[1].data).pow(2)).sum() / float(N_protest)
+    scores['violence_mse'] = ((outputs[1].cpu().data - targets[1].cpu().data).pow(2)).sum() / float(N_protest)
     # mean accuracy for visual attribute for this batch
-    comparison = (outputs[2].data.round() == targets[2].data)
-    comparison.masked_fill_(not_protest_mask.repeat(1, 10).data,0)
+    comparison = (outputs[2].cpu().data.round() == targets[2].cpu().data)
+    comparison.masked_fill_(not_protest_mask.repeat(1, 10).cpu().data,0)
     n_right = comparison.float().sum()
     mean_acc = n_right / float(N_protest*10)
     scores['visattr_acc'] = mean_acc
@@ -218,12 +220,15 @@ def validate(val_loader, model, criterions, epoch):
             loss += l
 
         if N_protest:
-            loss_protest.update(losses[0].data[0], input.size(0))
-            loss_v.update(loss.data[0] - losses[0].data[0], N_protest)
+            # loss_protest.update(losses[0].data[0], input.size(0))
+            # loss_v.update(loss.data[0] - losses[0].data[0], N_protest)
+            loss_protest.update(losses[0].data, input.size(0))
+            loss_v.update(loss.data - losses[0].data, N_protest)
         else:
             # when no protest images
-            loss_protest.update(losses[0].data[0], input.size(0))
-        loss_history.append(loss.data[0])
+            # loss_protest.update(losses[0].data[0], input.size(0))
+            loss_protest.update(losses[0].data, input.size(0))
+        loss_history.append(loss.data)
         protest_acc.update(scores['protest_acc'], input.size(0))
         violence_mse.update(scores['violence_mse'], N_protest)
         visattr_acc.update(scores['visattr_acc'], N_protest)
@@ -401,17 +406,17 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--workers",
                         type = int,
-                        default = 1,
+                        default = 0,
                         help = "number of workers",
                         )
     parser.add_argument("--batch_size",
                         type = int,
-                        default = 32,
+                        default = 32 ,
                         help = "batch size",
                         )
     parser.add_argument("--epochs",
                         type = int,
-                        default = 100,
+                        default = 1,
                         help = "number of epochs",
                         )
     parser.add_argument("--weight_decay",
@@ -444,8 +449,11 @@ if __name__ == "__main__":
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
     args = parser.parse_args()
+    print(args.cuda)
+    args.cuda = True
 
     if args.cuda:
+        print("here")
         protest_idx = protest_idx.cuda()
         violence_idx = violence_idx.cuda()
         visattr_idx = visattr_idx.cuda()
