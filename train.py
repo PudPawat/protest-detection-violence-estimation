@@ -25,7 +25,8 @@ from torch.autograd import Variable
 import torchvision.transforms as transforms
 import torchvision.models as models
 
-from util import ProtestDataset, modified_resnet50, AverageMeter, Lighting
+# from util import ProtestDataset, modified_resnet50, modified_resnet18,AverageMeter, Lighting, *
+from util import  *
 
 
 # for indexing output of the model
@@ -128,6 +129,7 @@ def train(train_loader, model, criterions, optimizer, epoch):
             target_var[k] = Variable(v)
 
         input_var = Variable(input)
+        # print("input_var",input_var.shape)
         output = model(input_var)
 
         losses, scores, N_protest = calculate_loss(output, target_var, criterions)
@@ -282,7 +284,15 @@ def main():
     txt_file_val = os.path.join(data_dir, "annot_test.txt")
 
     # load pretrained resnet50 with a modified last fully connected layer
-    model = modified_resnet50()
+    if args.model == "resnet50":
+        model = modified_resnet50()
+        print("model ------------>",args.model,model)
+    elif args.model == "resnet18":
+        model = modified_resnet18()
+        print("model ------------>",args.model,model)
+    elif args.model == "resnet34":
+        model = modified_resnet18()
+        print("model ------------>",args.model,model)
 
     # we need three different criterion for training
     criterion_protest = nn.BCELoss()
@@ -448,6 +458,9 @@ if __name__ == "__main__":
                         change learning rate when resuming")
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
+
+    parser.add_argument('--model', default="resnet34", type=str, metavar='N',
+                    help='manual select a model in "resnet18,resnet34, resnet50 "') # for the others will release 
     args = parser.parse_args()
     print(args.cuda)
     args.cuda = True

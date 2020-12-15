@@ -11,6 +11,7 @@ from torch.utils.data import Dataset
 import torch.nn as nn
 import torchvision.transforms as transforms
 import torchvision.models as models
+from models import *
 
 
 class ProtestDataset(Dataset):
@@ -76,17 +77,45 @@ class ProtestDatasetEval(Dataset):
         sample["image"] = self.transform(sample["image"])
         return sample
 
-class FinalLayer(nn.Module):
+class FinalLayer50(nn.Module):
     """modified last layer for resnet50 for our dataset"""
     def __init__(self):
-        super(FinalLayer, self).__init__()
+        super(FinalLayer50, self).__init__()
         self.fc = nn.Linear(2048, 12)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
+        # print("before fc",x.shape)
         out = self.fc(x)
         out = self.sigmoid(out)
         return out
+
+class FinalLayer18(nn.Module):
+    """modified last layer for resnet50 for our dataset"""
+    def __init__(self):
+        super(FinalLayer18, self).__init__()
+        self.fc = nn.Linear(512, 12)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # print("before fc",x.shape)
+        out = self.fc(x)
+        out = self.sigmoid(out)
+        return out
+
+class FinalLayer34(nn.Module):
+    """modified last layer for resnet50 for our dataset"""
+    def __init__(self):
+        super(FinalLayer34, self).__init__()
+        self.fc = nn.Linear(512, 12)  # did not edit value yet
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # print("before fc",x.shape)
+        out = self.fc(x)
+        out = self.sigmoid(out)
+        return out
+
 
 
 def pil_loader(path):
@@ -98,7 +127,7 @@ def pil_loader(path):
 def modified_resnet50():
     # load pretrained resnet50 with a modified last fully connected layer
     model = models.resnet50(pretrained = True)
-    model.fc = FinalLayer()
+    model.fc = FinalLayer50()
 
     # uncomment following lines if you wnat to freeze early layers
     # i = 0
@@ -108,6 +137,20 @@ def modified_resnet50():
     #         for param in child.parameters():
     #             param.requires_grad = False
 
+
+    return model
+
+def modified_resnet18():
+    # model = ResNet18
+    model = models.resnet18(pretrained=True)
+    model.fc = FinalLayer18()
+
+    return model
+
+def modified_resnet34():
+    # model = ResNet18
+    model = models.resnet34(pretrained=True)
+    model.fc = FinalLayer34()
 
     return model
 
