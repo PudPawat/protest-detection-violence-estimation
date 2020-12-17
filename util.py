@@ -116,7 +116,15 @@ class FinalLayer34(nn.Module):
         out = self.sigmoid(out)
         return out
 
+class Inceptionv3_layer(nn.Module):
+    def __init__(self):
+        super(Inceptionv3_layer,self).__init__()
+        
 
+def set_parameter_requires_grad(model, feature_extracting):
+        if feature_extracting:
+            for param in model.parameters():
+                param.requires_grad = False
 
 def pil_loader(path):
     # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
@@ -153,6 +161,29 @@ def modified_resnet34():
     model.fc = FinalLayer34()
 
     return model
+def modified_inception():
+    model_ft = models.inception_v3(pretrained=True)
+    
+    feature_extract = True
+    set_parameter_requires_grad(model_ft, feature_extract)
+    # Handle the auxilary net
+    num_ftrs_Aux = model_ft.AuxLogits.fc.in_features
+    model_ft.AuxLogits.fc = nn.Linear(num_ftrs_Aux, 12)
+    # Handle the primary net
+    num_ftrs_Linear = model_ft.fc.in_features
+    model_ft.fc = nn.Linear(num_ftrs_Linear,12)
+    input_size = 299
+    return model_ft
+
+def modified_squeeznet():
+    model_ft = models.squeezenet1_0(pretrained=True)
+    feature_extract = True
+    set_parameter_requires_grad(model_ft, feature_extract)
+    model_ft.classifier[1] = nn.Conv2d(512, 12, kernel_size=(1,1), stride=(1,1))
+    model_ft.num_classes = 12
+    input_size = 224
+
+    return model_ft
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""

@@ -131,6 +131,7 @@ def train(train_loader, model, criterions, optimizer, epoch):
         input_var = Variable(input)
         # print("input_var",input_var.shape)
         output = model(input_var)
+        print("output",type(output))
 
         losses, scores, N_protest = calculate_loss(output, target_var, criterions)
 
@@ -293,6 +294,12 @@ def main():
     elif args.model == "resnet34":
         model = modified_resnet18()
         print("model ------------>",args.model,model)
+    elif args.model == "inceptionv3":
+        model = modified_inception()
+        print("model ------------>",args.model,model)
+    elif args.model == "squeeznet":
+        model = modified_squeeznet()
+        print("model ------------>",args.model,model)
 
     # we need three different criterion for training
     criterion_protest = nn.BCELoss()
@@ -341,31 +348,62 @@ def main():
                            [-0.5808, -0.0045, -0.8140],
                            [-0.5836, -0.6948,  0.4203]])
 
-    train_dataset = ProtestDataset(
-                        txt_file = txt_file_train,
-                        img_dir = img_dir_train,
-                        transform = transforms.Compose([
-                                transforms.RandomResizedCrop(224),
-                                transforms.RandomRotation(30),
-                                transforms.RandomHorizontalFlip(),
-                                transforms.ColorJitter(
-                                    brightness = 0.4,
-                                    contrast = 0.4,
-                                    saturation = 0.4,
-                                    ),
-                                transforms.ToTensor(),
-                                Lighting(0.1, eigval, eigvec),
-                                normalize,
-                        ]))
-    val_dataset = ProtestDataset(
-                    txt_file = txt_file_val,
-                    img_dir = img_dir_val,
+    
+    if args.model == "inceptionv3":
+        train_dataset = ProtestDataset(
+                    txt_file = txt_file_train,
+                    img_dir = img_dir_train,
                     transform = transforms.Compose([
-                        transforms.Resize(256),
-                        transforms.CenterCrop(224),
-                        transforms.ToTensor(),
-                        normalize,
+                            transforms.RandomResizedCrop(299),
+                            transforms.RandomRotation(30),
+                            transforms.RandomHorizontalFlip(),
+                            transforms.ColorJitter(
+                                brightness = 0.4,
+                                contrast = 0.4,
+                                saturation = 0.4,
+                                ),
+                            transforms.ToTensor(),
+                            Lighting(0.1, eigval, eigvec),
+                            normalize,
                     ]))
+        val_dataset = ProtestDataset(
+                        txt_file = txt_file_val,
+                        img_dir = img_dir_val,
+                        transform = transforms.Compose([
+                            transforms.Resize(350),
+                            transforms.CenterCrop(299),
+                            transforms.ToTensor(),
+                            normalize,
+                        ]))
+    else:
+
+
+
+        train_dataset = ProtestDataset(
+                            txt_file = txt_file_train,
+                            img_dir = img_dir_train,
+                            transform = transforms.Compose([
+                                    transforms.RandomResizedCrop(224),
+                                    transforms.RandomRotation(30),
+                                    transforms.RandomHorizontalFlip(),
+                                    transforms.ColorJitter(
+                                        brightness = 0.4,
+                                        contrast = 0.4,
+                                        saturation = 0.4,
+                                        ),
+                                    transforms.ToTensor(),
+                                    Lighting(0.1, eigval, eigvec),
+                                    normalize,
+                            ]))
+        val_dataset = ProtestDataset(
+                        txt_file = txt_file_val,
+                        img_dir = img_dir_val,
+                        transform = transforms.Compose([
+                            transforms.Resize(256),
+                            transforms.CenterCrop(224),
+                            transforms.ToTensor(),
+                            normalize,
+                        ]))
     train_loader = DataLoader(
                     train_dataset,
                     num_workers = args.workers,
@@ -421,12 +459,12 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--batch_size",
                         type = int,
-                        default = 32 ,
+                        default = 64 ,
                         help = "batch size",
                         )
     parser.add_argument("--epochs",
                         type = int,
-                        default = 1,
+                        default = 100,
                         help = "number of epochs",
                         )
     parser.add_argument("--weight_decay",
@@ -459,8 +497,8 @@ if __name__ == "__main__":
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 
-    parser.add_argument('--model', default="resnet34", type=str, metavar='N',
-                    help='manual select a model in "resnet18,resnet34, resnet50 "') # for the others will release 
+    parser.add_argument('--model', default="squeeznet", type=str, metavar='N',
+                    help='manual select a model in "resnet18,resnet34, resnet50, squeeznet,inceptionv3 "') # for the others will release 
     args = parser.parse_args()
     print(args.cuda)
     args.cuda = True
