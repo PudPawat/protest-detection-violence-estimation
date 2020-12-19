@@ -11,6 +11,7 @@ from torch.utils.data import Dataset
 import torch.nn as nn
 import torchvision.transforms as transforms
 import torchvision.models as models
+from resnext_wsl import *
 from models import *
 
 
@@ -140,6 +141,10 @@ def pil_loader(path):
         img = Image.open(f)
         return img.convert('RGB')
 
+def modified_eff_resnet():
+    model = resnext101_32x48d_wsl(progress=True) # example with the ResNeXt-101 32x48d 
+    model.fc = FinalLayer50()
+    return model
 
 def modified_densenet161():
     model = models.densenet161(pretrained = True)

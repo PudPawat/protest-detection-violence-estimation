@@ -307,6 +307,9 @@ def main():
         # model = DenseNet(32, (6, 12, 32, 32),num_classes=12)
         model = modified_densenet161()
         print("model ------------>",args.model,model)
+    elif args.model == "eff_resnet":
+        model = modified_eff_resnet()
+        print("model ------------>",args.model,model)
 
     # we need three different criterion for training
     criterion_protest = nn.BCELoss()
@@ -466,7 +469,7 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--batch_size",
                         type = int,
-                        default = 16 ,
+                        default = 1 ,
                         help = "batch size",
                         )
     parser.add_argument("--epochs",
@@ -504,8 +507,8 @@ if __name__ == "__main__":
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 
-    parser.add_argument('--model', default="squeeznet", type=str, metavar='N',
-                    help='manual select a model in "resnet18,resnet34, resnet50, *squeeznet,*inceptionv3, densenet "') # for the others will release 
+    parser.add_argument('--model', default="eff_resnet", type=str, metavar='N',
+                    help='manual select a model in "resnet18,resnet34, resnet50, *squeeznet,*inceptionv3, densenet, eff_resnet "') # for the others will release 
     args = parser.parse_args()
     print(args.cuda)
     args.cuda = True
