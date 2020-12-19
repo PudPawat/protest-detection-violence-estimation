@@ -5,3 +5,4 @@ ucla*
 output/*
 output*
 *.tar
+*.pth

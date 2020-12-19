@@ -51,7 +51,10 @@ def calculate_loss(output, target, criterions, weights = [1, 10, 5]):
         targets[0] = target['protest'].float()
         losses = [weights[i] * criterions[i](outputs[i], targets[i]) for i in range(1)]
         scores = {}
-        scores['protest_acc'] = accuracy_score((outputs[0]).data.round(), targets[0].data)
+        # output = output.cpu().data
+        # targets = targets.data
+        # scores['protest_acc'] = accuracy_score((outputs[0]).data.round(), targets[0].data)
+        scores['protest_acc'] = accuracy_score((outputs[0]).cpu().data.round(), targets[0].cpu().data)
         scores['violence_mse'] = 0
         scores['visattr_acc'] = 0
         return losses, scores, N_protest
@@ -131,7 +134,7 @@ def train(train_loader, model, criterions, optimizer, epoch):
         input_var = Variable(input)
         # print("input_var",input_var.shape)
         output = model(input_var)
-        print("output",type(output))
+        # print("output",type(output))
 
         losses, scores, N_protest = calculate_loss(output, target_var, criterions)
 
@@ -300,6 +303,10 @@ def main():
     elif args.model == "squeeznet":
         model = modified_squeeznet()
         print("model ------------>",args.model,model)
+    elif args.model == "densenet":
+        # model = DenseNet(32, (6, 12, 32, 32),num_classes=12)
+        model = modified_densenet161()
+        print("model ------------>",args.model,model)
 
     # we need three different criterion for training
     criterion_protest = nn.BCELoss()
@@ -459,7 +466,7 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--batch_size",
                         type = int,
-                        default = 64 ,
+                        default = 16 ,
                         help = "batch size",
                         )
     parser.add_argument("--epochs",
@@ -498,7 +505,7 @@ if __name__ == "__main__":
                     help='manual epoch number (useful on restarts)')
 
     parser.add_argument('--model', default="squeeznet", type=str, metavar='N',
-                    help='manual select a model in "resnet18,resnet34, resnet50, squeeznet,inceptionv3 "') # for the others will release 
+                    help='manual select a model in "resnet18,resnet34, resnet50, *squeeznet,*inceptionv3, densenet "') # for the others will release 
     args = parser.parse_args()
     print(args.cuda)
     args.cuda = True

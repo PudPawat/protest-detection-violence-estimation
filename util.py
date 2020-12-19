@@ -115,10 +115,18 @@ class FinalLayer34(nn.Module):
         out = self.fc(x)
         out = self.sigmoid(out)
         return out
-
-class Inceptionv3_layer(nn.Module):
+class FinallayerDensenet161(nn.Module):
     def __init__(self):
-        super(Inceptionv3_layer,self).__init__()
+        super(FinallayerDensenet161, self).__init__()
+        self.classifier = nn.Linear(2208, 12)  # original = 1024
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # print("before fc",x.shape)
+        out = self.classifier(x)
+        out = self.sigmoid(out)
+        return out
+
         
 
 def set_parameter_requires_grad(model, feature_extracting):
@@ -131,6 +139,13 @@ def pil_loader(path):
     with open(path, 'rb') as f:
         img = Image.open(f)
         return img.convert('RGB')
+
+
+def modified_densenet161():
+    model = models.densenet161(pretrained = True)
+    model.classifier = FinallayerDensenet161()
+    return model
+    
 
 def modified_resnet50():
     # load pretrained resnet50 with a modified last fully connected layer
