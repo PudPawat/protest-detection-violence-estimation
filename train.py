@@ -284,8 +284,10 @@ def main():
     data_dir = args.data_dir
     img_dir_train = os.path.join(data_dir, "img/train")
     img_dir_val = os.path.join(data_dir, "img/test")
-    txt_file_train = os.path.join(data_dir, "annot_train.txt")
-    txt_file_val = os.path.join(data_dir, "annot_test.txt")
+    # txt_file_train = os.path.join(data_dir, "annot_train.txt")
+    txt_file_train = os.path.join(data_dir, "train.txt")
+    # txt_file_val = os.path.join(data_dir, "annot_test.txt")
+    txt_file_val = os.path.join(data_dir, "test.txt")
 
     # load pretrained resnet50 with a modified last fully connected layer
     if args.model == "resnet50":
@@ -440,7 +442,7 @@ def main():
         if is_best:
             print('best model!!')
         best_loss = min(loss_val, best_loss)
-
+        torch.save(model, "args.model"+".pth")
 
         save_checkpoint({
             'epoch' : epoch + 1,
@@ -469,7 +471,7 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--batch_size",
                         type = int,
-                        default = 1 ,
+                        default = 64 ,
                         help = "batch size",
                         )
     parser.add_argument("--epochs",
@@ -507,7 +509,7 @@ if __name__ == "__main__":
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 
-    parser.add_argument('--model', default="eff_resnet", type=str, metavar='N',
+    parser.add_argument('--model', default="resnet34", type=str, metavar='N',
                     help='manual select a model in "resnet18,resnet34, resnet50, *squeeznet,*inceptionv3, densenet, eff_resnet "') # for the others will release 
     args = parser.parse_args()
     print(args.cuda)

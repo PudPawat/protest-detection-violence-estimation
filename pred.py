@@ -17,7 +17,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.autograd import Variable
 import torchvision.models as models
 
-from util import ProtestDatasetEval, modified_resnet50
+from util import *
 
 
 def eval_one_dir(img_dir, model):
@@ -65,11 +65,28 @@ def main():
 
     # load trained model
     print("*** loading model from {model}".format(model = args.model))
-    model = modified_resnet50()
+    # model = modified_resnet34()
+    # model = modified_resnet50()
     if args.cuda:
-        model = model.cuda()
+        pass
+        # model = model.cuda()
     with open(args.model) as f:
-        model.load_state_dict(torch.load(f)['state_dict'])
+        
+        model1 = torch.load('args.model.pth', 'cuda')
+        print(type(model1))
+        # model1 = model1["state_dict"]
+        # print(model1.keys())
+        # print(len(model1.keys()))
+        # new_keys = ["layer1.2.conv1.weight", "layer1.2.bn1.weight", "layer1.2.bn1.bias", "layer1.2.bn1.running_mean", "layer1.2.bn1.running_var", "layer1.2.conv2.weight", "layer1.2.bn2.weight", "layer1.2.bn2.bias", "layer1.2.bn2.running_mean", "layer1.2.bn2.running_var", "layer2.2.conv1.weight", "layer2.2.bn1.weight", "layer2.2.bn1.bias", "layer2.2.bn1.running_mean", "layer2.2.bn1.running_var", "layer2.2.conv2.weight", "layer2.2.bn2.weight", "layer2.2.bn2.bias", "layer2.2.bn2.running_mean", "layer2.2.bn2.running_var", "layer2.3.conv1.weight", "layer2.3.bn1.weight", "layer2.3.bn1.bias", "layer2.3.bn1.running_mean", "layer2.3.bn1.running_var", "layer2.3.conv2.weight", "layer2.3.bn2.weight", "layer2.3.bn2.bias", "layer2.3.bn2.running_mean", "layer2.3.bn2.running_var", "layer3.2.conv1.weight", "layer3.2.bn1.weight", "layer3.2.bn1.bias", "layer3.2.bn1.running_mean", "layer3.2.bn1.running_var", "layer3.2.conv2.weight", "layer3.2.bn2.weight", "layer3.2.bn2.bias", "layer3.2.bn2.running_mean", "layer3.2.bn2.running_var", "layer3.3.conv1.weight", "layer3.3.bn1.weight", "layer3.3.bn1.bias", "layer3.3.bn1.running_mean", "layer3.3.bn1.running_var", "layer3.3.conv2.weight", "layer3.3.bn2.weight", "layer3.3.bn2.bias", "layer3.3.bn2.running_mean", "layer3.3.bn2.running_var", "layer3.4.conv1.weight", "layer3.4.bn1.weight", "layer3.4.bn1.bias", "layer3.4.bn1.running_mean", "layer3.4.bn1.running_var", "layer3.4.conv2.weight", "layer3.4.bn2.weight", "layer3.4.bn2.bias", "layer3.4.bn2.running_mean", "layer3.4.bn2.running_var", "layer3.5.conv1.weight", "layer3.5.bn1.weight", "layer3.5.bn1.bias", "layer3.5.bn1.running_mean", "layer3.5.bn1.running_var", "layer3.5.conv2.weight", "layer3.5.bn2.weight", "layer3.5.bn2.bias", "layer3.5.bn2.running_mean", "layer3.5.bn2.running_var", "layer4.2.conv1.weight", "layer4.2.bn1.weight", "layer4.2.bn1.bias", "layer4.2.bn1.running_mean", "layer4.2.bn1.running_var", "layer4.2.conv2.weight", "layer4.2.bn2.weight", "layer4.2.bn2.bias", "layer4.2.bn2.running_mean", "layer4.2.bn2.running_var"]
+        # print(model["state_dict"].keys)
+        # print(len(new_keys))
+        # for key,n_key in zip(model1.keys(),new_keys):
+        #     model1[n_key] = model1.pop(key)
+        model = model1
+        # model.load_state_dict(torch.load(args.model)['state_dict'])
+        # checkpoint = torch.load('checkpoint.pth.tar')
+        # model.load_state_dict(checkpoint['state_dict'])
+        # optimizer.load_state_dict(checkpoint['optimizer'])
     print("*** calculating the model output of the images in {img_dir}"
             .format(img_dir = args.img_dir))
 
@@ -83,7 +100,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--img_dir",
                         type=str,
-                        required = True,
+                        default="UCLA-protest/img/test",
+                        required = False,
                         help = "image directory to calculate output"
                         "(the directory must contain only image files)"
                         )
@@ -94,7 +112,8 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--model",
                         type=str,
-                        required = True,
+                        default="checkpoint.pth.tar",
+                        required = False,
                         help = "model path"
                         )
     parser.add_argument("--cuda",
@@ -103,14 +122,15 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--workers",
                         type = int,
-                        default = 4,
+                        default = 0,
                         help = "number of workers",
                         )
     parser.add_argument("--batch_size",
                         type = int,
-                        default = 16,
+                        default = 32,
                         help = "batch size",
                         )
     args = parser.parse_args()
+    args.cuda = True
 
     main()
