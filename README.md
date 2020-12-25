@@ -88,4 +88,6 @@ We fine-tuned ImageNet pretrained [ResNet50](https://arxiv.org/abs/1512.03385) t
 
 #### PudPawat Version
 Using Other model eg.VGG Inception
-https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
+https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html ;
+
+https://github.com/facebookresearch/FixRes ;
