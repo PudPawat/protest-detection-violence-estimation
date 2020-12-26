@@ -71,17 +71,8 @@ def main():
         pass
         # model = model.cuda()
     with open(args.model) as f:
-        
-        model1 = torch.load('args.model.pth', 'cuda')
+        model1 = torch.load(args.model, 'cuda')
         print(type(model1))
-        # model1 = model1["state_dict"]
-        # print(model1.keys())
-        # print(len(model1.keys()))
-        # new_keys = ["layer1.2.conv1.weight", "layer1.2.bn1.weight", "layer1.2.bn1.bias", "layer1.2.bn1.running_mean", "layer1.2.bn1.running_var", "layer1.2.conv2.weight", "layer1.2.bn2.weight", "layer1.2.bn2.bias", "layer1.2.bn2.running_mean", "layer1.2.bn2.running_var", "layer2.2.conv1.weight", "layer2.2.bn1.weight", "layer2.2.bn1.bias", "layer2.2.bn1.running_mean", "layer2.2.bn1.running_var", "layer2.2.conv2.weight", "layer2.2.bn2.weight", "layer2.2.bn2.bias", "layer2.2.bn2.running_mean", "layer2.2.bn2.running_var", "layer2.3.conv1.weight", "layer2.3.bn1.weight", "layer2.3.bn1.bias", "layer2.3.bn1.running_mean", "layer2.3.bn1.running_var", "layer2.3.conv2.weight", "layer2.3.bn2.weight", "layer2.3.bn2.bias", "layer2.3.bn2.running_mean", "layer2.3.bn2.running_var", "layer3.2.conv1.weight", "layer3.2.bn1.weight", "layer3.2.bn1.bias", "layer3.2.bn1.running_mean", "layer3.2.bn1.running_var", "layer3.2.conv2.weight", "layer3.2.bn2.weight", "layer3.2.bn2.bias", "layer3.2.bn2.running_mean", "layer3.2.bn2.running_var", "layer3.3.conv1.weight", "layer3.3.bn1.weight", "layer3.3.bn1.bias", "layer3.3.bn1.running_mean", "layer3.3.bn1.running_var", "layer3.3.conv2.weight", "layer3.3.bn2.weight", "layer3.3.bn2.bias", "layer3.3.bn2.running_mean", "layer3.3.bn2.running_var", "layer3.4.conv1.weight", "layer3.4.bn1.weight", "layer3.4.bn1.bias", "layer3.4.bn1.running_mean", "layer3.4.bn1.running_var", "layer3.4.conv2.weight", "layer3.4.bn2.weight", "layer3.4.bn2.bias", "layer3.4.bn2.running_mean", "layer3.4.bn2.running_var", "layer3.5.conv1.weight", "layer3.5.bn1.weight", "layer3.5.bn1.bias", "layer3.5.bn1.running_mean", "layer3.5.bn1.running_var", "layer3.5.conv2.weight", "layer3.5.bn2.weight", "layer3.5.bn2.bias", "layer3.5.bn2.running_mean", "layer3.5.bn2.running_var", "layer4.2.conv1.weight", "layer4.2.bn1.weight", "layer4.2.bn1.bias", "layer4.2.bn1.running_mean", "layer4.2.bn1.running_var", "layer4.2.conv2.weight", "layer4.2.bn2.weight", "layer4.2.bn2.bias", "layer4.2.bn2.running_mean", "layer4.2.bn2.running_var"]
-        # print(model["state_dict"].keys)
-        # print(len(new_keys))
-        # for key,n_key in zip(model1.keys(),new_keys):
-        #     model1[n_key] = model1.pop(key)
         model = model1
         # model.load_state_dict(torch.load(args.model)['state_dict'])
         # checkpoint = torch.load('checkpoint.pth.tar')
@@ -107,14 +98,14 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--output_csvpath",
                         type=str,
-                        default = "result.csv",
+                        default = "single_perceptron_result.csv",
                         help = "path to output csv file"
                         )
     parser.add_argument("--model",
                         type=str,
-                        default="checkpoint.pth.tar",
+                        default="output/single_perceptron_40ep/single_perceptron_best.pth", #checkpoint.pth.tar
                         required = False,
-                        help = "model path"
+                        help = "model path eg:output/single_perceptron_40ep/single_perceptron_best.pth"
                         )
     parser.add_argument("--cuda",
                         action = "store_true",

@@ -131,13 +131,17 @@ class FinallayerDensenet161(nn.Module):
 class Single_perceptron(nn.Module):
     def __init__(self):
         super(Single_perceptron, self).__init__()
-        self.fc = nn.Linear(int(224*224),12)
+        self.fc = nn.Linear(224*224*3,12)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        x.view(-1,224*224)
+        # print("x shape",x.shape)
+        x = x.view(-1,224*224*3)
+        # print("x shape",x.shape)
         out = self.fc(x)
+        # print("x shape",out.shape)
         out = self.sigmoid(out)
+        return out
 
 
 def single_perceptron():

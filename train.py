@@ -61,7 +61,7 @@ def calculate_loss(output, target, criterions, weights = [1, 10, 5]):
 
     # used for filling 0 for non-protest images
     not_protest_mask = (1 - target['protest']).byte()
-
+    # print(type(output))
     outputs = [None] * 4
     # protest output
     outputs[0] = output.index_select(1, protest_idx)
@@ -132,8 +132,10 @@ def train(train_loader, model, criterions, optimizer, epoch):
             target_var[k] = Variable(v)
 
         input_var = Variable(input)
+        # print(input_var.shape)
         # print("input_var",input_var.shape)
         output = model(input_var)
+        # print(output.shape)
         # print("output",type(output))
 
         losses, scores, N_protest = calculate_loss(output, target_var, criterions)
@@ -513,7 +515,7 @@ if __name__ == "__main__":
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 
-    parser.add_argument('--model', default="resnet34", type=str, metavar='N',
+    parser.add_argument('--model', default="single_perceptron", type=str, metavar='N',
                     help='manual select a model in "resnet18,resnet34, resnet50, *squeeznet,*inceptionv3, densenet, eff_resnet, single_perceptron "') # for the others will release 
     args = parser.parse_args()
     print(args.cuda)
