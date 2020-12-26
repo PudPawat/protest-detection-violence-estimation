@@ -128,8 +128,22 @@ class FinallayerDensenet161(nn.Module):
         out = self.sigmoid(out)
         return out
 
-        
+class Single_perceptron(nn.Module):
+    def __init__(self):
+        super(Single_perceptron, self).__init__()
+        self.fc = nn.Linear(int(224*224),12)
+        self.sigmoid = nn.Sigmoid()
 
+    def forward(self, x):
+        x.view(-1,224*224)
+        out = self.fc(x)
+        out = self.sigmoid(out)
+
+
+def single_perceptron():
+    model = Single_perceptron()
+    return model
+        
 def set_parameter_requires_grad(model, feature_extracting):
         if feature_extracting:
             for param in model.parameters():

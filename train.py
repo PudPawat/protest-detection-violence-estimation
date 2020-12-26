@@ -312,6 +312,9 @@ def main():
     elif args.model == "eff_resnet":
         model = modified_eff_resnet()
         print("model ------------>",args.model,model)
+    elif args.model == "single_perceptron":
+        model = single_perceptron()
+        print("model ------------>", args.model,model)
 
     # we need three different criterion for training
     criterion_protest = nn.BCELoss()
@@ -441,8 +444,9 @@ def main():
         is_best = loss_val < best_loss
         if is_best:
             print('best model!!')
+            torch.save(model, str(args.model)+"_best"+".pth")
         best_loss = min(loss_val, best_loss)
-        torch.save(model, "args.model"+".pth")
+        torch.save(model, str(args.model)+"_last"+".pth")
 
         save_checkpoint({
             'epoch' : epoch + 1,
@@ -471,12 +475,12 @@ if __name__ == "__main__":
                         )
     parser.add_argument("--batch_size",
                         type = int,
-                        default = 64 ,
+                        default = 90 ,
                         help = "batch size",
                         )
     parser.add_argument("--epochs",
                         type = int,
-                        default = 100,
+                        default = 40,
                         help = "number of epochs",
                         )
     parser.add_argument("--weight_decay",
@@ -510,11 +514,11 @@ if __name__ == "__main__":
                     help='manual epoch number (useful on restarts)')
 
     parser.add_argument('--model', default="resnet34", type=str, metavar='N',
-                    help='manual select a model in "resnet18,resnet34, resnet50, *squeeznet,*inceptionv3, densenet, eff_resnet "') # for the others will release 
+                    help='manual select a model in "resnet18,resnet34, resnet50, *squeeznet,*inceptionv3, densenet, eff_resnet, single_perceptron "') # for the others will release 
     args = parser.parse_args()
     print(args.cuda)
     args.cuda = True
-
+    print(str(args.model))
     if args.cuda:
         print("here")
         protest_idx = protest_idx.cuda()
